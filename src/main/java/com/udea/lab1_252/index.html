@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Banco UdeA - Frontend Básico</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h2 { color: #2c3e50; }
+    form { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; }
+    input { margin: 5px; padding: 5px; }
+    button { padding: 5px 10px; cursor: pointer; }
+    .result { margin-top: 10px; white-space: pre-wrap; background: #f4f4f4; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Banco UdeA - Frontend</h1>
+
+  <!-- Listar clientes -->
+  <h2>Clientes</h2>
+  <button onclick="getCustomers()">Ver todos los clientes</button>
+  <div id="customers" class="result"></div>
+
+  <!-- Crear cliente -->
+  <h2>Crear Cliente</h2>
+  <form onsubmit="createCustomer(event)">
+    <input type="text" id="firstName" placeholder="Nombre" required>
+    <input type="text" id="lastName" placeholder="Apellido" required>
+    <input type="text" id="accountNumber" placeholder="Número de cuenta" required>
+    <input type="number" step="0.01" id="balance" placeholder="Saldo inicial" required>
+    <button type="submit">Crear</button>
+  </form>
+  <div id="createResult" class="result"></div>
+
+  <!-- Transferir dinero -->
+  <h2>Transferencia</h2>
+  <form onsubmit="transferMoney(event)">
+    <input type="text" id="sender" placeholder="Cuenta origen" required>
+    <input type="text" id="receiver" placeholder="Cuenta destino" required>
+    <input type="number" step="0.01" id="amount" placeholder="Monto" required>
+    <button type="submit">Transferir</button>
+  </form>
+  <div id="transferResult" class="result"></div>
+
+  <!-- Transacciones -->
+  <h2>Transacciones de una cuenta</h2>
+  <form onsubmit="getTransactions(event)">
+    <input type="text" id="accountNumber" placeholder="Número de cuenta" required>
+    <button type="submit">Consultar</button>
+  </form>
+  <div id="transactions" class="result"></div>
+
+  <script>
+    const API_URL = "http://localhost:8080/api"; // Cambia el puerto si tu backend corre en otro
+
+    // Listar clientes
+    async function getCustomers() {
+      const res = await fetch(`${API_URL}/customers`);
+      const data = await res.json();
+      document.getElementById("customers").innerText = JSON.stringify(data, null, 2);
+    }
+
+    // Crear cliente
+    async function createCustomer(event) {
+      event.preventDefault();
+      const customer = {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        accountNumber: document.getElementById("accountNumber").value,
+        balance: parseFloat(document.getElementById("balance").value)
+      };
+      const res = await fetch(`${API_URL}/customers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(customer)
+      });
+      const data = await res.json();
+      document.getElementById("createResult").innerText = JSON.stringify(data, null, 2);
+    }
+
+    // Transferir dinero
+    async function transferMoney(event) {
+      event.preventDefault();
+      const transaction = {
+        senderAccountNumber: document.getElementById("sender").value,
+        receiverAccountNumber: document.getElementById("receiver").value,
+        amount: parseFloat(document.getElementById("amount").value)
+      };
+      const res = await fetch(`${API_URL}/transactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(transaction)
+      });
+      const data = await res.json();
+      document.getElementById("transferResult").innerText = JSON.stringify(data, null, 2);
+    }
+
+    // Ver transacciones por cuenta
+    async function getTransactions(event) {
+      event.preventDefault();
+      const accountNumber = document.getElementById("accountNumber").value;
+      const res = await fetch(`${API_URL}/transactions/${accountNumber}`);
+      const data = await res.json();
+      document.getElementById("transactions").innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
