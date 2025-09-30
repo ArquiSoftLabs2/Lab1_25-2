@@ -1,5 +1,6 @@
 package com.udea.lab1_252.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,7 @@ public class TransactionService {
         transaction.setSenderAccountNumber(sender.getAccountNumber());
         transaction.setReceiverAccountNumber(receiver.getAccountNumber());
         transaction.setAmount(transactionDTO.getAmount());
+        transaction.setTransactionDate(LocalDateTime.now()); // Establecer la fecha actual automáticamente
 
         transaction = transactionRepository.save(transaction);
 
@@ -62,6 +64,7 @@ public class TransactionService {
         savedTransaction.setSenderAccountNumber(transaction.getSenderAccountNumber());
         savedTransaction.setReceiverAccountNumber(transaction.getReceiverAccountNumber());
         savedTransaction.setAmount(transaction.getAmount());
+        savedTransaction.setTransactionDate(transaction.getTransactionDate());
 
         return savedTransaction;
     }
@@ -74,6 +77,7 @@ public class TransactionService {
             dto.setSenderAccountNumber(transaction.getSenderAccountNumber());
             dto.setReceiverAccountNumber(transaction.getReceiverAccountNumber());
             dto.setAmount(transaction.getAmount());
+            dto.setTransactionDate(transaction.getTransactionDate());
             return dto;
         }).collect(Collectors.toList());
     }
